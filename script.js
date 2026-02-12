@@ -114,6 +114,7 @@ addressInput.addEventListener("input", (e) => {
     addressInput.classList.add("border-red-600");
   }
 });
+
 //finalizar compra
 checkoutBtn.addEventListener("click", () => {
   //   if (!checkRestaurantOpen()) {
@@ -130,20 +131,37 @@ checkoutBtn.addEventListener("click", () => {
     return;
   }
 
-  //enviar pedido para api whatsapp
+  // Formatar itens do carrinho com estilo profissional
   const cartItems = cart
     .map((item) => {
-      return `${item.name} Quantidade: (${item.quantity}) R$ ${item.price.toFixed(2)} |`;
+      const itemTotal = item.price * item.quantity;
+      return `▪️ *${item.name}*\n   Qtd: ${item.quantity} x R$ ${item.price.toFixed(2)} = R$ ${itemTotal.toFixed(2)}`;
     })
-    .join("");
+    .join("\n\n");
 
-  const message = encodeURIComponent(cartItems);
+  // Calcular total do pedido
+  const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+  // Montar mensagem formatada e organizada
+  const message = encodeURIComponent(
+    `🍔 *NOVO PEDIDO - HERO'S BURGER* 🍔\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n\n` +
+    `📋 *ITENS DO PEDIDO:*\n\n` +
+    `${cartItems}\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n\n` +
+    `💰 *VALOR TOTAL:* R$ ${total.toFixed(2)}\n\n` +
+    `📍 *ENDEREÇO DE ENTREGA:*\n${addressInput.value}\n\n` +
+    `━━━━━━━━━━━━━━━━━━━━\n\n` +
+    `⏰ Pedido realizado em: ${new Date().toLocaleString('pt-BR')}`
+  );
+
   const phone = "63992863557";
 
   window.open(
-    `https://wa.me/${phone}?text=${message} Endereço: ${addressInput.value}`,
+    `https://wa.me/${phone}?text=${message}`,
     "_blank",
   );
+  
   cart.length = 0;
   updateCartModal();
 });
